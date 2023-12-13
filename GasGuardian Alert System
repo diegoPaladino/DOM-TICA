@@ -1,0 +1,20 @@
+// Define os pinos
+const int pinSensorGas = A0; // Pino A0 para o sensor MQ-135
+const int pinBuzzer = 2; // Pino D2 para o Buzzer
+
+void setup() {
+  pinMode(pinSensorGas, INPUT); // Define o pino do sensor como entrada
+  pinMode(pinBuzzer, OUTPUT); // Define o pino do buzzer como saída
+}
+
+void loop() {
+  int valorSensor = analogRead(pinSensorGas); // Lê o valor do sensor
+
+  if (valorSensor > limiarDeGas) { // Substitua 'limiarDeGas' pelo valor limite para detecção
+    digitalWrite(pinBuzzer, HIGH); // Ativa o buzzer
+  } else {
+    digitalWrite(pinBuzzer, LOW); // Desativa o buzzer
+  }
+
+  delay(1000); // Espera por um segundo antes de ler novamente
+}
