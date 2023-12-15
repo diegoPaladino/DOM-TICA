@@ -1,0 +1,77 @@
+#include <Adafruit_Fingerprint.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial mySerial(2, 3); // RX, TX
+Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
+int relayPin = 4; // Relay connected to pin 4
+
+void setup()  
+{
+  Serial.begin(9600);
+  while (!Serial);  // For Leonardo/Micro/Zero
+
+  finger.begin(57600);
+  if (finger.verifyPassword()) {
+    Serial.println("Found fingerprint sensor!");
+  } else {
+    Serial.println("Did not find fingerprint sensor :(");
+    while (1) { delay(1); }
+  }
+  
+  pinMode(relayPin, OUTPUT);
+  digitalWrite(relayPin, LOW);
+}
+
+void loop()                     
+{
+  getFingerprintIDez();
+  delay(50);            // Small delay
+}
+
+uint8_t getFingerprintIDez() {
+  uint8_t p = finger.getImage();
+  switch (p) {
+    case FINGERPRINT_OK:
+      Serial.println("Image taken");
+      break;
+    case FINGERPRINT_NOFINGER:
+      return p;
+    case FINGERPRINT_PACKETRECIEVEERR:
+      return p;
+    default:
+      Serial.println("Unknown error");
+      return p;
+  }
+
+  p = finger.image2Tz();
+  switch (p) {
+    case FINGERPRINT_OK:
+      Serial.println("Image converted");
+      break;
+    case FINGERPRINT_IMAGEMESS:
+      return p;
+    case FINGERPRINT_PACKETRECIEVEERR:
+      return p;
+    case FINGERPRINT_FEATUREFAIL:
+      return p;
+    case FINGERPRINT_INVALIDIMAGE:
+      return p;
+    default:
+      Serial.println("Unknown error");
+      return p;
+  }
+
+  p = finger.fingerFastSearch();
+  if (p == FINGERPRINT_OK) {
+    Serial.println("Fingerprint found");
+    digitalWrite(relayPin, HIGH); // Activate solenoid
+    delay(5000); // Keep solenoid open for 5 seconds
+    digitalWrite(relayPin, LOW); // Deactivate solenoid
+  } else if (p == FINGERPRINT_NOTFOUND) {
+    Serial.println("Did not find a match");
+  } else {
+    Serial.println("Unknown error");
+  }
+
+  return p;
+}
