@@ -1,0 +1,22 @@
+#define ENDSTOP_PIN 2 // Define the pin for the end-stop switch
+#define RELAY_PIN 8   // Define the pin for the relay controlling the lights
+#define LIGHT_SENSOR_PIN A0 // Define the pin for the light sensor
+#define LIGHT_THRESHOLD 400 // Define the threshold for light level
+
+void setup() {
+  pinMode(ENDSTOP_PIN, INPUT_PULLUP); // Initialize the end-stop switch pin as an input
+  pinMode(RELAY_PIN, OUTPUT);         // Initialize the relay pin as an output
+  pinMode(LIGHT_SENSOR_PIN, INPUT);   // Initialize the light sensor pin as an input
+  digitalWrite(RELAY_PIN, LOW);       // Ensure the lights are off initially
+}
+
+void loop() {
+  int lightLevel = analogRead(LIGHT_SENSOR_PIN); // Read the light level
+  // Check the state of the end-stop switch and the light level
+  if (digitalRead(ENDSTOP_PIN) == LOW && lightLevel < LIGHT_THRESHOLD) {
+    // If the switch is open and the light level is low, turn on the lights
+    digitalWrite(RELAY_PIN, HIGH);
+  } else {
+    // Otherwise, turn off the lights
+    digitalWrite(RELAY_PIN, LOW);
+  }
